@@ -44,6 +44,7 @@ function App() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const form = event.currentTarget;
 
     // raise this error if file is blank
     if (!selectedFile) {
@@ -51,7 +52,7 @@ function App() {
       return;
     }
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
 
     try {
       await submitForm({
@@ -61,7 +62,7 @@ function App() {
         image: selectedFile.file,
       });
 
-      event.currentTarget.reset();
+      form.reset();
       setSelectedFile(null);
       setUploadFormKey((key) => key + 1);
       setSubmitSuccess(true);
