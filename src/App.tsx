@@ -62,6 +62,17 @@ function App() {
         image: selectedFile.file,
       });
 
+      // raise errors if the other fields aree blank
+      if(!formData.get('name')){
+        alert('Please enter your name before submitting.');
+      }
+      else if(!formData.get('dropdown')){
+        alert('Please select an affiliate before submitting.');
+      }
+      else if(!formData.get('code')){
+        alert('Please enter an event code before submitting.');
+      }
+
       form.reset();
       setSelectedFile(null);
       setUploadFormKey((key) => key + 1);
