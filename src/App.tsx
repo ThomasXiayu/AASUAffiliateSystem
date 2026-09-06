@@ -12,6 +12,7 @@ function App() {
   const [backendReady, setBackendReady] = useState(false);
 
   //comment all this (warmup functions) out if you wanna test in local
+  // jk after deploying it requires the creds to work, maybe ill fix this eventually
   useEffect(() => {
     let cancelled = false;
 
@@ -38,10 +39,12 @@ function App() {
   }, []);
 
   const [selectedFile, setSelectedFile] = useState<UploadedFile | null>(null);
+  const [uploadFormKey, setUploadFormKey] = useState(0);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    // raise this error if file is blank
     if (!selectedFile) {
       alert('Please select an attendance picture before submitting.');
       return;
@@ -56,6 +59,10 @@ function App() {
         inputThree: String(formData.get('code') ?? ''),
         image: selectedFile.file,
       });
+
+      event.currentTarget.reset();
+      setSelectedFile(null);
+      setUploadFormKey((key) => key + 1);
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Submission failed.');
     }
@@ -86,8 +93,8 @@ function App() {
           <Input label="Name" id="name" placeholder="Enter your name"/>
           <Dropdown label="Affiliate" id="dropdown" placeholder="Select an affiliate"/>
           <Input label="Event Code" id="code" placeholder="Input event code"/>
-          <FileUploadForm onFileSelected={setSelectedFile} />
-          <button disabled={!backendReady}
+          <FileUploadForm key={uploadFormKey} onFileSelected={setSelectedFile} />
+          <button active:bg-blue-500 disabled={!backendReady}
             type="submit"
             className={`w-full ${backendReady ? 'bg-blue-400 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'} text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}>
             {backendReady ? 'Submit' : 'Connecting...'}

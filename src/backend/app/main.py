@@ -81,12 +81,12 @@ async def create_submission(
             detail="Image must be smaller than 5 MB.",
         )
 
-    # Use a generated filename instead of trusting the user's filename
+    # make our own filename for each submit
     extension = ALLOWED_IMAGE_TYPES[content_type]
     object_path = f"{uuid.uuid4()}{extension}"
 
     try:
-        # Upload image to the private Supabase Storage bucket
+        # Upload image to bucket (we only save image file path to table)
         upload_result = supabase.storage.from_(BUCKET_NAME).upload(
             object_path,
             image_bytes,
@@ -97,12 +97,11 @@ async def create_submission(
             },
         )
 
-        # Some versions of supabase-py expose errors through the returned object.
-        # The request will raise if the upload fails.
+        # check if upload worked
         if not upload_result:
             raise RuntimeError("Image upload failed.")
 
-        # Store the text values and Storage path in Postgres
+        # Store the text values and image path in Postgres
         insert_result = (
             supabase.table("form_submissions")
             .insert(
@@ -125,7 +124,7 @@ async def create_submission(
         }
 
     except Exception as error:
-        # Avoid leaving an orphaned image if the database insert fails
+        # remove image from database if submission fails (rare edge case)
         try:
             supabase.storage.from_(BUCKET_NAME).remove([object_path])
         except Exception:
