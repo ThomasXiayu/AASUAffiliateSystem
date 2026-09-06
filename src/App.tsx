@@ -46,13 +46,26 @@ function App() {
     event.preventDefault();
     const form = event.currentTarget;
 
+    const formData = new FormData(form);
+
     // raise this error if file is blank
     if (!selectedFile) {
       alert('Please select an attendance picture before submitting.');
       return;
     }
-
-    const formData = new FormData(form);
+    // raise errors if the other fields aree blank
+    if(!formData.get('name')){
+      alert('Please enter your name before submitting.');
+      return;
+    }
+    else if(!formData.get('dropdown')){
+      alert('Please select an affiliate before submitting.');
+      return;
+    }
+    else if(!formData.get('code')){
+      alert('Please enter an event code before submitting.');
+      return;
+    }
 
     try {
       await submitForm({
@@ -61,17 +74,6 @@ function App() {
         inputThree: String(formData.get('code') ?? ''),
         image: selectedFile.file,
       });
-
-      // raise errors if the other fields aree blank
-      if(!formData.get('name')){
-        alert('Please enter your name before submitting.');
-      }
-      else if(!formData.get('dropdown')){
-        alert('Please select an affiliate before submitting.');
-      }
-      else if(!formData.get('code')){
-        alert('Please enter an event code before submitting.');
-      }
 
       form.reset();
       setSelectedFile(null);

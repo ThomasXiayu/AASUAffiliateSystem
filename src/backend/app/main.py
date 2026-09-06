@@ -39,11 +39,10 @@ ALLOWED_IMAGE_TYPES = {
 
 MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5 MB
 
-
+# using this for deploy checks and boot up server
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
-
 
 @app.post("/api/submissions")
 async def create_submission(
