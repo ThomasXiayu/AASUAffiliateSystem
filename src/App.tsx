@@ -48,11 +48,6 @@ function App() {
 
     const formData = new FormData(form);
 
-    // raise this error if file is blank
-    if (!selectedFile) {
-      alert('Please select an attendance picture before submitting.');
-      return;
-    }
     // raise errors if the other fields aree blank
     if(!formData.get('name')){
       alert('Please enter your name before submitting.');
@@ -64,6 +59,10 @@ function App() {
     }
     else if(!formData.get('code')){
       alert('Please enter an event code before submitting.');
+      return;
+    }
+    else if (!selectedFile) {
+      alert('Please select an attendance picture before submitting.');
       return;
     }
 
@@ -79,7 +78,7 @@ function App() {
       setSelectedFile(null);
       setUploadFormKey((key) => key + 1);
       setSubmitSuccess(true);
-      setTimeout(() => setSubmitSuccess(false), 1000);
+      setTimeout(() => setSubmitSuccess(false), 500);
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Submission failed.');
     }
