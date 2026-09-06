@@ -66,7 +66,7 @@ function App() {
       {/*Navbar*/}
       <div className="flex items-center justify-between p-3 bg-red-900 text-white">
         <a className="shrink-0" href="https://hq.fsu.edu/feeds?type=club&type_id=35480&tab=about">
-          <img className="block h-10 w-10 object-contain" src={aasulogo} alt="AASU" />
+          <img src={aasulogo} className="block h-10 w-10 object-contain" />
         </a>
         <div className="flex gap-2 ml-auto">
           <span className="hover:font-bold cursor-pointer">Home</span>
