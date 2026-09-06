@@ -40,6 +40,7 @@ function App() {
 
   const [selectedFile, setSelectedFile] = useState<UploadedFile | null>(null);
   const [uploadFormKey, setUploadFormKey] = useState(0);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -63,6 +64,8 @@ function App() {
       event.currentTarget.reset();
       setSelectedFile(null);
       setUploadFormKey((key) => key + 1);
+      setSubmitSuccess(true);
+      setTimeout(() => setSubmitSuccess(false), 1000);
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Submission failed.');
     }
@@ -96,8 +99,11 @@ function App() {
           <FileUploadForm key={uploadFormKey} onFileSelected={setSelectedFile} />
           <button active:bg-blue-500 disabled={!backendReady}
             type="submit"
-            className={`w-full ${backendReady ? 'bg-blue-400 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'} text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}>
-            {backendReady ? 'Submit' : 'Connecting...'}
+            className={`w-full 
+            ${submitSuccess ? 'bg-emerald-400' : 
+            backendReady ? 'bg-blue-400 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'} 
+            text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300`}>
+            {submitSuccess? 'Successfully Submitted!' : backendReady ? 'Submit' : 'Connecting...'}
           </button>
         </form>
       </div>
