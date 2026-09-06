@@ -1,11 +1,42 @@
 import Input from './components/input';
+import aasulogo from './assets/aasulogo.png';
 import { Dropdown } from './components/input';
 import { FileUploadForm } from './components/input';
 import type { UploadedFile } from './components/input';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { submitForm } from './api';
+
 function App() {
+  const API_URL = import.meta.env.VITE_API_URL;
+  const [backendReady, setBackendReady] = useState(false);
+
+  //comment all this (warmup functions) out if you wanna test in local
+  useEffect(() => {
+    let cancelled = false;
+
+    function warmBackend() {
+      fetch(`${API_URL}/health`)
+        .then((res) => {
+          if (!res.ok) throw new Error('not ready');
+          if (!cancelled) {
+            setBackendReady(true);
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setTimeout(warmBackend, 3000);
+          }
+        });
+    }
+
+    warmBackend();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const [selectedFile, setSelectedFile] = useState<UploadedFile | null>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -35,7 +66,7 @@ function App() {
       {/*Navbar*/}
       <div className="flex items-center justify-between p-3 bg-red-900 text-white">
         <a className="shrink-0" href="https://hq.fsu.edu/feeds?type=club&type_id=35480&tab=about">
-          <img className="block h-10 w-10 object-contain" src="./src/assets/aasulogo.png" alt="AASU" />
+          <img className="block h-10 w-10 object-contain" src={aasulogo} alt="AASU" />
         </a>
         <div className="flex gap-2 ml-auto">
           <span className="hover:font-bold cursor-pointer">Home</span>
@@ -56,10 +87,10 @@ function App() {
           <Dropdown label="Affiliate" id="dropdown" placeholder="Select an affiliate"/>
           <Input label="Event Code" id="code" placeholder="Input event code"/>
           <FileUploadForm onFileSelected={setSelectedFile} />
-          <button 
+          <button disabled={!backendReady}
             type="submit"
-            className="w-full bg-blue-400 text-white py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-            Submit
+            className={`w-full ${backendReady ? 'bg-blue-400 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'} text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}>
+            {backendReady ? 'Submit' : 'Connecting...'}
           </button>
         </form>
       </div>

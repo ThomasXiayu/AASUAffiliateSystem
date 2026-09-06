@@ -4,11 +4,11 @@
 This application was made to address a specific problem that AASU had regarding tracking and keeping a database of "points" collected by other students within AASU's community.
 
 ## Overview
-An over engineered Google Form that takes inputs and adds it to a database. Internal logic helps automate data collection, leaderboards, and point tracking.
+An over engineered Google Form that takes inputs and adds it to a database. Internal logic helps automate data collection, leaderboards, and point tracking. Depending on efficiency and usefulness, this project is made with credentials that can be passed down to future student leaders.
 
-**Frontend**: Typescript w/ Tailwind CSS and Vite
+**Frontend**: Typescript w/ Tailwind CSS and Vite\n
 **Backend**: Python w/ FastAPI and PostgresSQL
 
 ### Contributors
-**Project Manager & Designer**: @Sarah Thapa
-**Full Stack Developer**: @ThomasXiayu
+**Project Manager**: @Sarah Thapa\n
+**Developer**: @ThomasXiayu
