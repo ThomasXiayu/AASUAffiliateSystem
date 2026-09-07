@@ -13,6 +13,7 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_SECRET_KEY = os.environ["SUPABASE_SECRET_KEY"]
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "https://localhost:5173")
+
 EVENT_CODE_TTL_HOURS = float(os.getenv("EVENT_CODE_TTL_HOURS", "24"))
 
 supabase: Client = create_client(
@@ -24,7 +25,7 @@ app = FastAPI(title="Form Submission API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_ORIGIN],
+    allow_origins=FRONTEND_ORIGIN,
     allow_credentials=True,
     allow_methods=["POST", "GET"],
     allow_headers=["*"],
@@ -83,13 +84,31 @@ def refresh_leaderboard(affiliate: str) -> None:
 
 @app.get("/api/leaderboard")
 def get_leaderboard():
-    result = (
-        supabase.table("leaderboard")
-        .select("affiliates, rank, points")
-        .order("rank")
-        .execute()
-    )
-    return {"leaderboard": result.data or []}
+    try:
+        result = (
+            supabase.table("leaderboard")
+            .select("affiliates, points")
+            .execute()
+        )
+        rows = result.data or []
+        rows.sort(key=lambda row: (-int(row.get("points") or 0), row["affiliates"]))
+
+        return {
+            "leaderboard": [
+                {
+                    "affiliates": row["affiliates"],
+                    "rank": position,
+                    "points": int(row.get("points") or 0),
+                }
+                for position, row in enumerate(rows, start=1)
+            ]
+        }
+    except Exception as error:
+        print(f"Leaderboard error: {error}")
+        raise HTTPException(
+            status_code=500,
+            detail="Could not load leaderboard.",
+        )
 
 
 @app.post("/api/codesetup")
