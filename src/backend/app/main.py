@@ -44,6 +44,76 @@ MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5 MB
 def health_check():
     return {"status": "ok"}
 
+
+@app.post("/api/codesetup")
+async def codesetup(
+    input_one: str = Form(...),
+    input_two: str = Form(...),
+    input_three: str = Form(...),
+):
+    # Basic string validation
+    input_one = input_one.strip()
+    input_two = input_two.strip()
+    input_three = input_three.strip()
+
+    if not input_one or not input_two or not input_three:
+        raise HTTPException(
+            status_code=400,
+            detail="All three fields are required.",
+        )
+
+    try:
+        # validate presidents key
+        key_result = (
+            supabase.table("affiliate_secrets")
+            .select("master_key, affiliate")
+            .eq("master_key", input_two)
+            .limit(1)
+            .execute()
+        )
+
+        if not key_result.data:
+            raise HTTPException(
+                status_code=403,
+                detail="The president key is not valid.",
+            )
+
+        affiliate = key_result.data[0].get("affiliate")
+
+        if not affiliate:
+            raise HTTPException(
+                status_code=500,
+                detail="The president key has no affiliate assigned.",
+            )
+
+        # Store only the name and event code.
+        insert_result = (
+            supabase.table("code_creations")
+            .insert(
+                {
+                    "input_one": input_one,
+                    "input_three": input_three,
+                }
+            )
+            .execute()
+        )
+
+        if not insert_result.data:
+            raise RuntimeError("Database insert failed.")
+            
+        return {
+            "success": True,
+            "affiliate": affiliate
+            }
+    
+    except HTTPException:
+        raise
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to process submission: {str(error)}",
+        )
+
 @app.post("/api/submissions")
 async def create_submission(
     input_one: str = Form(...),
@@ -105,9 +175,9 @@ async def create_submission(
             supabase.table("form_submissions")
             .insert(
                 {
-                    "input_one": input_one,
-                    "input_two": input_two,
-                    "input_three": input_three,
+                    "Name": input_one,
+                    "Affiliate": input_two,
+                    "Event_Code": input_three,
                     "image_path": object_path,
                 }
             )
