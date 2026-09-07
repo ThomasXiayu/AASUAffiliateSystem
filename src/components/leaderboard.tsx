@@ -42,16 +42,17 @@ function Leaderboard({ refreshKey = 0 }: { refreshKey?: number }){
                     <div className="max-w-3xl mx-auto mt-2 w-full p-4 sm:p-6 drop-shadow bg-gray-500 rounded-lg shadow-md border border-gray-200 space-y-2">
                         {error && <p className="text-center text-red-200">{error}</p>}
                         {!error && entries.map((entry) => {
-                            const logo = affiliateLogos[entry.affiliates.toLowerCase()];
+                            const affiliateName = entry.affiliates?.trim() || "Unknown affiliate";
+                            const logo = affiliateLogos[affiliateName.toLowerCase()];
 
                             return (
-                                <div key={entry.affiliates} className="grid grid-cols-[3rem_1fr_auto] items-center gap-3 rounded bg-white px-3 py-2 text-slate-950">
+                                <div key={`${affiliateName}-${entry.rank}`} className="grid grid-cols-[3rem_1fr_auto] items-center gap-3 rounded bg-white px-3 py-2 text-slate-950">
                                     {logo ? (
-                                        <img src={logo} alt={`${entry.affiliates} logo`} className="h-12 w-12 object-contain" />
+                                        <img src={logo} alt={`${affiliateName} logo`} className="h-12 w-12 object-contain" />
                                     ) : (
                                         <div className="h-12 w-12" aria-hidden="true" />
                                     )}
-                                    <span className="font-semibold">{entry.affiliates}</span>
+                                    <span className="font-semibold">{affiliateName}</span>
                                     <span className="text-right font-semibold">{entry.points} points</span>
                                 </div>
                             );

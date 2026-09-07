@@ -4,12 +4,22 @@ export type LeaderboardEntry = {
   points: number;
 };
 
+function apiUrl(): string {
+  const url = import.meta.env.VITE_API_URL?.trim();
+
+  if (!url) {
+    throw new Error("VITE_API_URL is not configured for this frontend.");
+  }
+
+  return url.replace(/\/$/, "");
+}
+
 export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
   let response: Response;
 
   try {
     response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/leaderboard`,
+      `${apiUrl()}/api/leaderboard`,
     );
   } catch {
     throw new Error("Could not connect to the leaderboard.");
