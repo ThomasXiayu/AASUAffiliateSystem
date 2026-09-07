@@ -41,7 +41,8 @@ function App() {
 
   const [selectedFile, setSelectedFile] = useState<UploadedFile | null>(null);
   const [uploadFormKey, setUploadFormKey] = useState(0);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [attendanceSubmitSuccess, setAttendanceSubmitSuccess] = useState(false);
+  const [codeSubmitSuccess, setCodeSubmitSuccess] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -78,8 +79,8 @@ function App() {
       form.reset();
       setSelectedFile(null);
       setUploadFormKey((key) => key + 1);
-      setSubmitSuccess(true);
-      setTimeout(() => setSubmitSuccess(false), 1000);
+      setAttendanceSubmitSuccess(true);
+      setTimeout(() => setAttendanceSubmitSuccess(false), 1000);
     } catch (error) {
       // would be astonished if this ever triggered
       alert(error instanceof Error ? error.message : 'Submission failed.');
@@ -114,8 +115,8 @@ function App() {
       });
 
       form.reset();
-      setSubmitSuccess(true);
-      setTimeout(() => setSubmitSuccess(false), 1000);
+      setCodeSubmitSuccess(true);
+      setTimeout(() => setCodeSubmitSuccess(false), 1000);
     } catch (error) {
       // would be astonished if this ever triggered
       alert(error instanceof Error ? error.message : 'Code set up failed.');
@@ -154,10 +155,10 @@ function App() {
             <button active:bg-blue-500 disabled={!backendReady}
               type="submit"
               className={`w-full 
-              ${submitSuccess ? 'bg-emerald-400' : 
+              ${attendanceSubmitSuccess ? 'bg-emerald-400' : 
               backendReady ? 'bg-blue-400 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'} 
               text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300`}>
-              {submitSuccess? 'Successfully Submitted!' : backendReady ? 'Submit' : 'Connecting...'}
+              {attendanceSubmitSuccess ? 'Successfully Submitted!' : backendReady ? 'Submit' : 'Connecting...'}
             </button>
           </form>
         </div>
@@ -170,13 +171,13 @@ function App() {
             <Input label="Name" id="codeName" placeholder="Enter your name"/>
             <Input label="President's Key" id="presidentKey" placeholder="Input affiliate president's key"/>
             <Input label="Event Code" id="eventCode" placeholder="Set 1-time event code"/>
-            <button
+            <button active:bg-blue-500 disabled={!backendReady}
               type="submit"
               className={`w-full 
-              ${submitSuccess ? 'bg-emerald-400' : 
+              ${codeSubmitSuccess ? 'bg-emerald-400' : 
               backendReady ? 'bg-blue-400 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'} 
               text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300`}>
-              {submitSuccess? 'Successfully Submitted!' : backendReady ? 'Submit' : 'Connecting...'}
+              {codeSubmitSuccess ? 'Successfully Submitted!' : backendReady ? 'Submit' : 'Connecting...'}
             </button>
           </form>
         </div>

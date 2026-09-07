@@ -5,6 +5,11 @@ export type SubmissionInput = {
   image: File;
 };
 
+export type submissionResponse = {
+  success: boolean;
+  affiliate: string;
+};
+
 export async function submitForm({
   inputOne,
   inputTwo,
@@ -27,7 +32,7 @@ export async function submitForm({
   );
 
   const responseText = await response.text();
-  let result: { detail?: string; success?: boolean; submission_id?: string } = {};
+  let result: Partial<submissionResponse> & { detail?: string } = {};
 
   if (responseText) {
     try {
@@ -43,5 +48,5 @@ export async function submitForm({
     throw new Error(result.detail || "Submission failed.");
   }
 
-  return result;
+  return result as submissionResponse;
 }

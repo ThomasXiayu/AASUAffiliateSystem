@@ -91,8 +91,8 @@ async def codesetup(
             supabase.table("code_creations")
             .insert(
                 {
-                    "input_one": input_one,
-                    "input_three": input_three,
+                    "name": input_one,
+                    "event_code": input_three,
                 }
             )
             .execute()
@@ -170,6 +170,22 @@ async def create_submission(
         if not upload_result:
             raise RuntimeError("Image upload failed.")
 
+        # validate event code
+        key_result = (
+            supabase.table("code_creations")
+            .select("event_code, affiliate")
+            .eq("event_code", input_three)
+            .limit(1)
+            .execute()
+        )
+
+        affiliate = key_result.data[0]["affiliate"] if key_result.data else None
+        if not key_result.data:
+            raise HTTPException(
+                status_code=403,
+                detail="The event code is not valid.",
+            )
+
         # Store the text values and image path in Postgres
         insert_result = (
             supabase.table("form_submissions")
@@ -189,7 +205,7 @@ async def create_submission(
 
         return {
             "success": True,
-            "submission_id": insert_result.data[0]["id"],
+            "affiliate": affiliate,
         }
 
     except Exception as error:
