@@ -1,4 +1,13 @@
 import React, { useState } from "react";
+import aasulogo from '../assets/aasulogo.png';
+import akdphilogo from '../assets/akdphilogo.png';
+import casologo from '../assets/casologo.png';
+import fsalogo from '../assets/fsalogo.png';
+import jsalogo from '../assets/jsalogo.png';
+import kasalogo from '../assets/kasalogo.png';
+import sasalogo from '../assets/sasalogo.png';
+import saselogo from '../assets/saselogo.png';
+import vsalogo from '../assets/vsalogo.png';
 
 function Input({ placeholder, id, label, type }: { placeholder: string, id: string, label?: string, type?: "text" | "email" | "password" | "number" }) {
     return (
@@ -75,6 +84,37 @@ function FileUploadForm({ onFileSelected }: { onFileSelected: (file: UploadedFil
   );
 }
 
+const eventLogos: Record<string, string> = {
+  aasu: aasulogo,
+  akdphi: akdphilogo,
+  caso: casologo,
+  fsa: fsalogo,
+  jsa: jsalogo,
+  kasa: kasalogo,
+  sasa: sasalogo,
+  sase: saselogo,
+  vsa: vsalogo,
+};
+
+function EventLogoPreview({logo}: {logo: string}) {
+  let logoSource = eventLogos[logo.toLowerCase()];
+
+  if (!logoSource) {
+    logoSource = aasulogo;
+  }
+
+    return(
+        <div className="flex justify-center">
+            <img
+            src={logoSource}
+            alt={`${logo} logo`}
+            className="w-32 h-32 object-contain"
+            />
+        </div>
+    );
+}
+
 export default Input;
 export { Dropdown };
 export { FileUploadForm };
+export { EventLogoPreview };
