@@ -53,7 +53,7 @@ def health_check():
 def refresh_leaderboard(affiliate: str) -> None:
     leaderboard_result = (
         supabase.table("leaderboard")
-        .select("affiliates, rank, points")
+        .select("affiliates, points")
         .eq("affiliates", affiliate)
         .limit(1)
         .execute()
@@ -65,9 +65,7 @@ def refresh_leaderboard(affiliate: str) -> None:
             {"points": int(row.get("points") or 0) + 1}
         ).eq("affiliates", affiliate).execute()
     else:
-        supabase.table("leaderboard").insert(
-            {"affiliates": affiliate, "rank": 0, "points": 1}
-        ).execute()
+        raise RuntimeError(f"Affiliate '{affiliate}' is missing from leaderboard.")
 
     all_rows = (
         supabase.table("leaderboard")
@@ -237,7 +235,6 @@ async def create_submission(
             .execute()
         )
 
-        affiliate = key_result.data[0]["affiliate"] if key_result.data else None
         if not key_result.data:
             raise HTTPException(
                 status_code=403,
@@ -261,11 +258,12 @@ async def create_submission(
         if not insert_result.data:
             raise RuntimeError("Database insert failed.")
 
+        # The dropdown affiliate earns the point, regardless of who created the code.
         refresh_leaderboard(input_two)
 
         return {
             "success": True,
-            "affiliate": affiliate,
+            "affiliate": input_two,
         }
 
     # delete the bucket path if the code is expired
