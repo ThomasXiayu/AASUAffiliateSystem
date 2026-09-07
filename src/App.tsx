@@ -78,8 +78,9 @@ function App() {
       setSelectedFile(null);
       setUploadFormKey((key) => key + 1);
       setSubmitSuccess(true);
-      setTimeout(() => setSubmitSuccess(false), 500);
+      setTimeout(() => setSubmitSuccess(false), 1000);
     } catch (error) {
+      // would be astonished if this ever triggered
       alert(error instanceof Error ? error.message : 'Submission failed.');
     }
   };
