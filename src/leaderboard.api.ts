@@ -12,7 +12,7 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
       `${import.meta.env.VITE_API_URL}/api/leaderboard`,
     );
   } catch {
-    throw new Error("Could not connect to the leaderboard service.");
+    throw new Error("Could not connect to the leaderboard.");
   }
 
   const responseText = await response.text();

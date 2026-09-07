@@ -13,6 +13,13 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_SECRET_KEY = os.environ["SUPABASE_SECRET_KEY"]
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "https://localhost:5173")
+FRONTEND_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "FRONTEND_ORIGINS", FRONTEND_ORIGIN
+    ).split(",")
+    if origin.strip()
+]
 
 EVENT_CODE_TTL_HOURS = float(os.getenv("EVENT_CODE_TTL_HOURS", "24"))
 
@@ -25,7 +32,7 @@ app = FastAPI(title="Form Submission API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=FRONTEND_ORIGIN,
+    allow_origins=FRONTEND_ORIGINS,
     allow_credentials=True,
     allow_methods=["POST", "GET"],
     allow_headers=["*"],
@@ -52,29 +59,24 @@ def health_check():
 
 
 def refresh_leaderboard(affiliate: str) -> None:
-    leaderboard_result = (
-        supabase.table("leaderboard")
-        .select("affiliates, points")
-        .eq("affiliates", affiliate)
-        .limit(1)
-        .execute()
+    leaderboard_result = supabase.table("leaderboard").select("*").execute()
+    matching_row = next(
+        (
+            row for row in (leaderboard_result.data or [])
+            if str(row.get("affiliates", "")).casefold() == affiliate.casefold()
+        ),
+        None,
     )
 
-    if leaderboard_result.data:
-        row = leaderboard_result.data[0]
+    if matching_row:
         supabase.table("leaderboard").update(
-            {"points": int(row.get("points") or 0) + 1}
-        ).eq("affiliates", affiliate).execute()
+            {"points": int(matching_row.get("points") or 0) + 1}
+        ).eq("affiliates", matching_row["affiliates"]).execute()
     else:
         raise RuntimeError(f"Affiliate '{affiliate}' is missing from leaderboard.")
 
-    all_rows = (
-        supabase.table("leaderboard")
-        .select("affiliates, rank, points")
-        .order("points", desc=True)
-        .order("affiliates")
-        .execute()
-    ).data or []
+    all_rows = supabase.table("leaderboard").select("*").execute().data or []
+    all_rows.sort(key=lambda row: (-int(row.get("points") or 0), row["affiliates"]))
 
     for position, row in enumerate(all_rows, start=1):
         supabase.table("leaderboard").update(
@@ -85,11 +87,7 @@ def refresh_leaderboard(affiliate: str) -> None:
 @app.get("/api/leaderboard")
 def get_leaderboard():
     try:
-        result = (
-            supabase.table("leaderboard")
-            .select("affiliates, points")
-            .execute()
-        )
+        result = supabase.table("leaderboard").select("*").execute()
         rows = result.data or []
         rows.sort(key=lambda row: (-int(row.get("points") or 0), row["affiliates"]))
 
@@ -278,7 +276,10 @@ async def create_submission(
             raise RuntimeError("Database insert failed.")
 
         # The dropdown affiliate earns the point, regardless of who created the code.
-        refresh_leaderboard(input_two)
+        try:
+            refresh_leaderboard(input_two)
+        except Exception as leaderboard_error:
+            print(f"Leaderboard update error: {leaderboard_error}")
 
         return {
             "success": True,
