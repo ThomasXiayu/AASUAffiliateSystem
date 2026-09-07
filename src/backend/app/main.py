@@ -13,13 +13,6 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_SECRET_KEY = os.environ["SUPABASE_SECRET_KEY"]
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "https://localhost:5173")
-FRONTEND_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv(
-        "FRONTEND_ORIGINS", FRONTEND_ORIGIN
-    ).split(",")
-    if origin.strip()
-]
 
 EVENT_CODE_TTL_HOURS = float(os.getenv("EVENT_CODE_TTL_HOURS", "24"))
 
@@ -32,7 +25,7 @@ app = FastAPI(title="Form Submission API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=FRONTEND_ORIGINS,
+    allow_origins=FRONTEND_ORIGIN,
     allow_credentials=True,
     allow_methods=["POST", "GET"],
     allow_headers=["*"],
@@ -63,7 +56,7 @@ def refresh_leaderboard(affiliate: str) -> None:
     matching_row = next(
         (
             row for row in (leaderboard_result.data or [])
-            if str(row.get("affiliates", "")).casefold() == affiliate.casefold()
+            if str(row.get("affiliate", "")).casefold() == affiliate.casefold()
         ),
         None,
     )
@@ -71,17 +64,17 @@ def refresh_leaderboard(affiliate: str) -> None:
     if matching_row:
         supabase.table("leaderboard").update(
             {"points": int(matching_row.get("points") or 0) + 1}
-        ).eq("affiliates", matching_row["affiliates"]).execute()
+        ).eq("affiliate", matching_row["affiliate"]).execute()
     else:
         raise RuntimeError(f"Affiliate '{affiliate}' is missing from leaderboard.")
 
     all_rows = supabase.table("leaderboard").select("*").execute().data or []
-    all_rows.sort(key=lambda row: (-int(row.get("points") or 0), row["affiliates"]))
+    all_rows.sort(key=lambda row: (-int(row.get("points") or 0), row["affiliate"]))
 
     for position, row in enumerate(all_rows, start=1):
         supabase.table("leaderboard").update(
             {"rank": position}
-        ).eq("affiliates", row["affiliates"]).execute()
+        ).eq("affiliate", row["affiliate"]).execute()
 
 
 @app.get("/api/leaderboard")
@@ -89,12 +82,12 @@ def get_leaderboard():
     try:
         result = supabase.table("leaderboard").select("*").execute()
         rows = result.data or []
-        rows.sort(key=lambda row: (-int(row.get("points") or 0), row["affiliates"]))
+        rows.sort(key=lambda row: (-int(row.get("points") or 0), row["affiliate"]))
 
         return {
             "leaderboard": [
                 {
-                    "affiliates": row["affiliates"],
+                    "affiliate": row["affiliate"],
                     "rank": position,
                     "points": int(row.get("points") or 0),
                 }
