@@ -108,7 +108,7 @@ function EventLogoPreview({logo}: {logo: string}) {
             <img
             src={logoSource}
             alt={`${logo} logo`}
-            className="w-32 h-32 object-contain"
+            className="w-32 h-32 object-contain self-stretch"
             />
         </div>
     );

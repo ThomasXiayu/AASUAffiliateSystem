@@ -145,7 +145,7 @@ function App() {
       </div>
 
       {/*form divs begin here*/}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 items-start gap-1">
         {/*1st form*/}
         <div className="w-[calc(100%-2rem)] max-w-xl mx-auto mt-2 p-4 sm:p-6 drop-shadow bg-slate-200 rounded-lg shadow-md border border-gray-200">
           <div className="text-xl md:text-2xl lg:text-3xl font-semibold text-center text-slate-950">Event Attendance Form</div>
