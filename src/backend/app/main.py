@@ -50,6 +50,50 @@ def health_check():
     return {"status": "ok"}
 
 
+def refresh_leaderboard(affiliate: str) -> None:
+    leaderboard_result = (
+        supabase.table("leaderboard")
+        .select("affiliates, rank, points")
+        .eq("affiliates", affiliate)
+        .limit(1)
+        .execute()
+    )
+
+    if leaderboard_result.data:
+        row = leaderboard_result.data[0]
+        supabase.table("leaderboard").update(
+            {"points": int(row.get("points") or 0) + 1}
+        ).eq("affiliates", affiliate).execute()
+    else:
+        supabase.table("leaderboard").insert(
+            {"affiliates": affiliate, "rank": 0, "points": 1}
+        ).execute()
+
+    all_rows = (
+        supabase.table("leaderboard")
+        .select("affiliates, rank, points")
+        .order("points", desc=True)
+        .order("affiliates")
+        .execute()
+    ).data or []
+
+    for position, row in enumerate(all_rows, start=1):
+        supabase.table("leaderboard").update(
+            {"rank": position}
+        ).eq("affiliates", row["affiliates"]).execute()
+
+
+@app.get("/api/leaderboard")
+def get_leaderboard():
+    result = (
+        supabase.table("leaderboard")
+        .select("affiliates, rank, points")
+        .order("rank")
+        .execute()
+    )
+    return {"leaderboard": result.data or []}
+
+
 @app.post("/api/codesetup")
 async def codesetup(
     input_one: str = Form(...),
@@ -109,7 +153,7 @@ async def codesetup(
 
         if not insert_result.data:
             raise RuntimeError("Database insert failed.")
-            
+
         return {
             "success": True,
             "affiliate": affiliate,
@@ -216,6 +260,8 @@ async def create_submission(
 
         if not insert_result.data:
             raise RuntimeError("Database insert failed.")
+
+        refresh_leaderboard(input_two)
 
         return {
             "success": True,

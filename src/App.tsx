@@ -8,6 +8,7 @@ import type { FormEvent } from 'react';
 import { submitForm } from './attendance.api';
 import { setCode } from './code.api';
 import { EventLogoPreview } from './components/input';
+import Leaderboard from './components/leaderboard';
 
 function App() {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -45,6 +46,7 @@ function App() {
   const [attendanceSubmitSuccess, setAttendanceSubmitSuccess] = useState(false);
   const [codeSubmitSuccess, setCodeSubmitSuccess] = useState(false);
   const [eventLogo, setEventLogo] = useState<string>('aasu')
+  const [leaderboardRefreshKey, setLeaderboardRefreshKey] = useState(0);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -81,6 +83,7 @@ function App() {
       form.reset();
       setSelectedFile(null);
       setUploadFormKey((key) => key + 1);
+      setLeaderboardRefreshKey((key) => key + 1);
       setAttendanceSubmitSuccess(true);
       setTimeout(() => setAttendanceSubmitSuccess(false), 1000);
     } catch (error) {
@@ -134,7 +137,7 @@ function App() {
           <img src={aasulogo} className="block h-10 w-10 object-contain" />
         </a>
         <div className="flex gap-2 ml-auto">
-          <span className="hover:font-bold cursor-pointer">Home</span>
+          <span className="hover:font-bold cursor-pointer">Forms</span>
           <span className="hover:font-bold cursor-pointer">Leaderboard</span>
         </div>
       </div>
@@ -186,6 +189,9 @@ function App() {
           </form>
         </div>
       </div>
+
+      {/*leaderboard here*/}
+      <Leaderboard refreshKey={leaderboardRefreshKey} />
     </div>
   );
 }
