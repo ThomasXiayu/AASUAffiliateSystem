@@ -1,5 +1,13 @@
 import Input from './components/input';
 import aasulogo from './assets/aasulogo.png';
+import akdphiLogo from './assets/akdphilogo.png';
+import casoLogo from './assets/casologo.png';
+import fsaLogo from './assets/fsalogo.png';
+import jsaLogo from './assets/jsalogo.png';
+import kasaLogo from './assets/kasalogo.png';
+import sasaLogo from './assets/sasalogo.png';
+import saseLogo from './assets/saselogo.png';
+import vsaLogo from './assets/vsalogo.png';
 import { Dropdown } from './components/input';
 import { FileUploadForm } from './components/input';
 import type { UploadedFile } from './components/input';
@@ -43,6 +51,19 @@ function App() {
   const [uploadFormKey, setUploadFormKey] = useState(0);
   const [attendanceSubmitSuccess, setAttendanceSubmitSuccess] = useState(false);
   const [codeSubmitSuccess, setCodeSubmitSuccess] = useState(false);
+  const [codeAffiliate, setCodeAffiliate] = useState<string | null>(null);
+ 
+  // missing lphie and heal
+  const affiliateLogos: Record<string, string> = {
+    akdphi: akdphiLogo,
+    caso: casoLogo,
+    fsa: fsaLogo,
+    jsa: jsaLogo,
+    kasa: kasaLogo,
+    sasa: sasaLogo,
+    sase: saseLogo,
+    vsa: vsaLogo,
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -108,13 +129,14 @@ function App() {
     }
 
     try {
-      await setCode({
+      const result = await setCode({
         inputOne: String(formData.get('codeName') ?? ''),
         inputTwo: String(formData.get('presidentKey') ?? ''),
         inputThree: String(formData.get('eventCode') ?? ''),
       });
 
       form.reset();
+      setCodeAffiliate(result.affiliate);
       setCodeSubmitSuccess(true);
       setTimeout(() => setCodeSubmitSuccess(false), 1000);
     } catch (error) {
@@ -164,13 +186,22 @@ function App() {
         </div>
 
         {/*2nd form*/}
-        <div className="w-[calc(100%-2rem)] max-w-xl mx-auto mt-2 p-4 sm:p-6 drop-shadow bg-slate-200 rounded-lg shadow-md border border-gray-200">
+        <div className="w-[calc(100%-2rem)] max-w-xl mx-auto mt-2 p-4 sm:p-6 drop-shadow bg-slate-200 rounded-lg shadow-md border border-gray-200 self-stretch">
           <div className="text-xl md:text-2xl lg:text-3xl font-semibold text-center text-slate-950">Event Code Setup</div>
           <form className="mt-4 space-y-4" onSubmit={handleCodeSubmit}>
             {/*form details go here*/}
             <Input label="Name" id="codeName" placeholder="Enter your name"/>
             <Input label="President's Key" id="presidentKey" placeholder="Input affiliate president's key"/>
             <Input label="Event Code" id="eventCode" placeholder="Set 1-time event code"/>
+            {codeAffiliate && affiliateLogos[codeAffiliate.toLowerCase()] && (
+              <div className="flex justify-center">
+                <img
+                  src={affiliateLogos[codeAffiliate.toLowerCase()]}
+                  alt={`${codeAffiliate} logo`}
+                  className="h-32 w-32 object-contain"
+                />
+              </div>
+            )}
             <button active:bg-blue-500 disabled={!backendReady}
               type="submit"
               className={`w-full 

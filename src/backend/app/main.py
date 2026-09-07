@@ -1,5 +1,6 @@
 import os
 import uuid
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -12,6 +13,7 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_SECRET_KEY = os.environ["SUPABASE_SECRET_KEY"]
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "https://localhost:5173")
+EVENT_CODE_TTL_HOURS = float(os.getenv("EVENT_CODE_TTL_HOURS", "24"))
 
 supabase: Client = create_client(
     SUPABASE_URL,
@@ -38,6 +40,9 @@ ALLOWED_IMAGE_TYPES = {
 }
 
 MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5 MB
+
+def event_code_expiration_cutoff() -> str:
+    return (datetime.now(timezone.utc) - timedelta(hours=EVENT_CODE_TTL_HOURS)).isoformat()
 
 # using this for deploy checks and boot up server
 @app.get("/health")
@@ -86,12 +91,16 @@ async def codesetup(
                 detail="The president key has no affiliate assigned.",
             )
 
-        # Store only the name and event code.
+        # Remove the affiliate's previous code before creating its replacement.
+        supabase.table("code_creations").delete().eq("affiliate", affiliate).execute()
+
+        # Store the new code. Supabase's created_at default starts its TTL.
         insert_result = (
             supabase.table("code_creations")
             .insert(
                 {
                     "name": input_one,
+                    "affiliate": affiliate,
                     "event_code": input_three,
                 }
             )
@@ -103,7 +112,7 @@ async def codesetup(
             
         return {
             "success": True,
-            "affiliate": affiliate
+            "affiliate": affiliate,
             }
     
     except HTTPException:
@@ -170,7 +179,12 @@ async def create_submission(
         if not upload_result:
             raise RuntimeError("Image upload failed.")
 
-        # validate event code
+        # Remove expired codes before looking up the submitted code.
+        supabase.table("code_creations").delete().lt(
+            "created_at", event_code_expiration_cutoff()
+        ).execute()
+
+        # Validate the event code.
         key_result = (
             supabase.table("code_creations")
             .select("event_code, affiliate")
@@ -208,6 +222,14 @@ async def create_submission(
             "affiliate": affiliate,
         }
 
+    # delete the bucket path if the code is expired
+    except HTTPException:
+        try:
+            supabase.storage.from_(BUCKET_NAME).remove([object_path])
+        except Exception:
+            pass
+        raise
+
     except Exception as error:
         # remove image from database if submission fails (rare edge case)
         try:
@@ -218,5 +240,5 @@ async def create_submission(
         print(f"Submission error: {error}")
         raise HTTPException(
             status_code=500,
-            detail="Could not save the submission.",
+            detail="Could not submit. Check event code",
         )
