@@ -253,7 +253,7 @@ async def create_submission(
         if not key_result.data:
             raise HTTPException(
                 status_code=403,
-                detail="The event code is not valid.",
+                detail="The event code is not valid. (Note: Codes are case-sensitive)",
             )
 
         # Store the text values and image path in Postgres

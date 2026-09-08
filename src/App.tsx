@@ -167,7 +167,7 @@ function App() {
             <button active:bg-blue-500 disabled={!backendReady || attendanceSubmitting}
               type="submit"
               className={`w-full 
-              ${attendanceSubmitting ? 'bg-gray-300 cursor-wait' : attendanceSubmitSuccess ? 'bg-emerald-400' : 
+              ${attendanceSubmitting ? 'bg-gray-400 cursor-wait' : attendanceSubmitSuccess ? 'bg-emerald-400' : 
               backendReady ? 'bg-blue-400 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'} 
               text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300`}>
               {attendanceSubmitting ? 'Processing' : attendanceSubmitSuccess ? 'Successfully Submitted!' : backendReady ? 'Submit' : 'Connecting...'}
