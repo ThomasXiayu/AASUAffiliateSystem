@@ -13,11 +13,6 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_SECRET_KEY = os.environ["SUPABASE_SECRET_KEY"]
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "https://localhost:5173")
-FRONTEND_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv("FRONTEND_ORIGINS", FRONTEND_ORIGIN).split(",")
-    if origin.strip()
-]
 
 EVENT_CODE_TTL_HOURS = float(os.getenv("EVENT_CODE_TTL_HOURS", "24"))
 
@@ -30,7 +25,7 @@ app = FastAPI(title="Form Submission API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=FRONTEND_ORIGINS,
+    allow_origins=[FRONTEND_ORIGIN],
     allow_credentials=True,
     allow_methods=["POST", "GET"],
     allow_headers=["*"],
