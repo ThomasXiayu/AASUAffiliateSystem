@@ -1,5 +1,5 @@
 export type LeaderboardEntry = {
-  affiliates: string;
+  affiliate: string;
   rank: number;
   points: number;
 };
