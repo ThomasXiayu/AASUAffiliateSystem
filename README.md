@@ -6,8 +6,8 @@ This application was made to address a specific problem that AASU had regarding 
 ## Overview
 An over engineered Google Form that takes inputs and adds it to a database. Internal logic helps automate data collection, leaderboards, and point tracking. Depending on efficiency and usefulness, this project is made with credentials that can be passed down to future student leaders.
 
-**Frontend**: Typescript w/ Tailwind CSS and Vite\n
-**Backend**: Python w/ FastAPI and PostgresSQL
+**Frontend**: Typescript w/ Tailwind CSS and React\n
+**Backend**: Python and PostgresSQL
 
 ### Contributors
 **Project Manager**: @Sarah Thapa\n

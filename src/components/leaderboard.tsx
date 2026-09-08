@@ -56,7 +56,7 @@ function Leaderboard({ refreshKey = 0 }: { refreshKey?: number }){
                                     ) : (
                                         <div className="h-12 w-12" aria-hidden="true" />
                                     )}
-                                    <span className="font-semibold">{affiliateName}</span>
+                                    <span className="font-semibold">{affiliateName.toUpperCase()}</span>
                                     <span className="text-right font-semibold">{entry.points} points</span>
                                 </div>
                             );

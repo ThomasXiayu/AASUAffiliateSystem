@@ -189,7 +189,7 @@ function App() {
               ${codeSubmitSuccess ? 'bg-emerald-400' : 
               backendReady ? 'bg-blue-400 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'} 
               text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300`}>
-              {codeSubmitSuccess ? 'Created New Code!' : backendReady ? 'Submit' : 'Connecting...'}
+              {codeSubmitSuccess ? 'Created New Code!' : backendReady ? 'Create Code' : 'Connecting...'}
             </button>
           </form>
         </div>
