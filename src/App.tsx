@@ -44,6 +44,7 @@ function App() {
   const [selectedFile, setSelectedFile] = useState<UploadedFile | null>(null);
   const [uploadFormKey, setUploadFormKey] = useState(0);
   const [attendanceSubmitSuccess, setAttendanceSubmitSuccess] = useState(false);
+  const [attendanceSubmitting, setAttendanceSubmitting] = useState(false);
   const [codeSubmitSuccess, setCodeSubmitSuccess] = useState(false);
   const [eventLogo, setEventLogo] = useState<string>('aasu')
   const [leaderboardRefreshKey, setLeaderboardRefreshKey] = useState(0);
@@ -72,6 +73,8 @@ function App() {
       return;
     }
 
+    setAttendanceSubmitting(true);
+
     try {
       await submitForm({
         inputOne: String(formData.get('name') ?? ''),
@@ -89,6 +92,8 @@ function App() {
     } catch (error) {
       // would be astonished if this ever triggered
       alert(error instanceof Error ? error.message : 'Submission failed.');
+    } finally {
+      setAttendanceSubmitting(false);
     }
   };
 
@@ -158,13 +163,14 @@ function App() {
             <Dropdown label="Affiliate" id="dropdown" placeholder="Select an affiliate"/>
             <Input label="Event Code" id="code" placeholder="Input event code"/>
             <FileUploadForm key={uploadFormKey} onFileSelected={setSelectedFile} />
-            <button active:bg-blue-500 disabled={!backendReady}
+            {/*this is clutterd, but its layered conditionals*/}
+            <button active:bg-blue-500 disabled={!backendReady || attendanceSubmitting}
               type="submit"
               className={`w-full 
-              ${attendanceSubmitSuccess ? 'bg-emerald-400' : 
+              ${attendanceSubmitting ? 'bg-gray-300 cursor-wait' : attendanceSubmitSuccess ? 'bg-emerald-400' : 
               backendReady ? 'bg-blue-400 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'} 
               text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300`}>
-              {attendanceSubmitSuccess ? 'Successfully Submitted!' : backendReady ? 'Submit' : 'Connecting...'}
+              {attendanceSubmitting ? 'Processing' : attendanceSubmitSuccess ? 'Successfully Submitted!' : backendReady ? 'Submit' : 'Connecting...'}
             </button>
           </form>
         </div>
