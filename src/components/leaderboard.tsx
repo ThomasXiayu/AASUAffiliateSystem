@@ -38,10 +38,10 @@ function Leaderboard({ refreshKey = 0 }: { refreshKey?: number }){
     }, [refreshKey]);
 
     return (
-        <div className= "pt-16"> {/*margin between sections*/}
+        <div className= "pt-16 scroll-mt-4"> {/*margin between sections*/}
             <div className="p-1 bg-black"> {/*border line separator*/}
                 <div className="flex flex-col px-4 pt-4 min-h-screen bg-blue-800">
-                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-center text-white">Leaderboard</h1>
+                    <h1 id="leaderboard" className="text-3xl md:text-4xl lg:text-5xl font-semibold text-center text-white">Leaderboard</h1>
 
                     <div className="max-w-3xl mx-auto mt-2 w-full p-4 sm:p-6 drop-shadow bg-gray-500 rounded-lg shadow-md border border-gray-200 space-y-2">
                         {error && <p className="text-center text-red-200">{error}</p>}

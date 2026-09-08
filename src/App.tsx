@@ -142,8 +142,7 @@ function App() {
           <img src={aasulogo} className="block h-10 w-10 object-contain" />
         </a>
         <div className="flex gap-2 ml-auto">
-          <span className="hover:font-bold cursor-pointer">Forms</span>
-          <span className="hover:font-bold cursor-pointer">Leaderboard</span>
+          <a className="hover:font-bold cursor-pointer" href="#leaderboard">Leaderboard</a>
         </div>
       </div>
 
