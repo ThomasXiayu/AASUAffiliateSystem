@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import aasulogo from '../assets/aasulogo.png';
 import akdphilogo from '../assets/akdphilogo.png';
 import casologo from '../assets/casologo.png';
+import heallogo from "../assets/heallogo.png";
 import fsalogo from '../assets/fsalogo.png';
 import jsalogo from '../assets/jsalogo.png';
 import kasalogo from '../assets/kasalogo.png';
+import lphielogo from "../assets/lphielogo.png";
 import sasalogo from '../assets/sasalogo.png';
 import saselogo from '../assets/saselogo.png';
 import vsalogo from '../assets/vsalogo.png';
@@ -88,9 +90,11 @@ const eventLogos: Record<string, string> = {
   aasu: aasulogo,
   akdphi: akdphilogo,
   caso: casologo,
+  heal: heallogo,
   fsa: fsalogo,
   jsa: jsalogo,
   kasa: kasalogo,
+  lphie: lphielogo,
   sasa: sasalogo,
   sase: saselogo,
   vsa: vsalogo,

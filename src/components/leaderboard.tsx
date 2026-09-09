@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import akdphiLogo from "../assets/akdphilogo.png";
 import casoLogo from "../assets/casologo.png";
+import heallogo from "../assets/heallogo.png";
 import fsaLogo from "../assets/fsalogo.png";
 import jsaLogo from "../assets/jsalogo.png";
 import kasaLogo from "../assets/kasalogo.png";
+import lphielogo from "../assets/lphielogo.png";
 import sasaLogo from "../assets/sasalogo.png";
 import saseLogo from "../assets/saselogo.png";
 import vsaLogo from "../assets/vsalogo.png";
@@ -13,9 +15,11 @@ import { getLeaderboard } from "../leaderboard.api";
 const affiliateLogos: Record<string, string> = {
     akdphi: akdphiLogo,
     caso: casoLogo,
+    heal: heallogo,
     fsa: fsaLogo,
     jsa: jsaLogo,
     kasa: kasaLogo,
+    lphie: lphielogo,
     sasa: sasaLogo,
     sase: saseLogo,
     vsa: vsaLogo,
