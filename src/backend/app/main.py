@@ -51,7 +51,7 @@ def health_check():
     return {"status": "ok"}
 
 
-def refresh_leaderboard(affiliate: str) -> None:
+def refresh_leaderboard(affiliate: str, points: int = 1) -> None:
     leaderboard_result = supabase.table("leaderboard").select("*").execute()
     matching_row = next(
         (
@@ -63,7 +63,7 @@ def refresh_leaderboard(affiliate: str) -> None:
 
     if matching_row:
         supabase.table("leaderboard").update(
-            {"points": int(matching_row.get("points") or 0) + 1}
+            {"points": int(matching_row.get("points") or 0) + points}
         ).eq("affiliate", matching_row["affiliate"]).execute()
     else:
         raise RuntimeError(f"Affiliate '{affiliate}' is missing from leaderboard.")
@@ -251,6 +251,14 @@ async def create_submission(
                 detail="The event code is not valid. (Note: Codes are case-sensitive)",
             )
 
+        code_affiliate = key_result.data[0].get("affiliate")
+
+        if str(code_affiliate).casefold() == input_two.casefold():
+            raise HTTPException(
+                status_code=403,
+                detail="Affiliates cannot earn points from their own events.",
+            )
+
         # Store the text values and image path in Postgres
         insert_result = (
             supabase.table("form_submissions")
@@ -268,9 +276,10 @@ async def create_submission(
         if not insert_result.data:
             raise RuntimeError("Database insert failed.")
 
-        # The dropdown affiliate earns the point, regardless of who created the code.
+        # add points to affiliates
         try:
-            refresh_leaderboard(input_two)
+            points = 3 if str(code_affiliate).casefold() == "aasu" else 1
+            refresh_leaderboard(input_two, points)
         except Exception as leaderboard_error:
             print(f"Leaderboard update error: {leaderboard_error}")
 

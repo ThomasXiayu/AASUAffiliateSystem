@@ -51,10 +51,18 @@ function App() {
   const [leaderboardRefreshKey, setLeaderboardRefreshKey] = useState(0);
 
   const navItems = [
+    { key: 'leaderboard', label: 'Leaderboard' },
     { key: 'attendance', label: 'Event Attendance Form' },
     { key: 'code-setup', label: 'Event Code Set Up' },
-    { key: 'leaderboard', label: 'Leaderboard' },
   ] as const;
+
+  const handlePageChange = (page: typeof currentPage) => {
+    setCurrentPage(page);
+    setSelectedFile(null);
+    setUploadFormKey((key) => key + 1);
+    setAttendanceSubmitSuccess(false);
+    setCodeSubmitSuccess(false);
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -143,7 +151,7 @@ function App() {
           <div className="text-xl md:text-2xl lg:text-3xl font-semibold text-center text-slate-950">
             Event Attendance Form
           </div>
-          <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
+          <form key="attendance-form" className="mt-4 space-y-4" onSubmit={handleSubmit}>
             <Input label="Name" id="name" placeholder="Enter your name" />
             <Dropdown label="Affiliate" id="dropdown" placeholder="Select an affiliate" />
             <Input label="Event Code" id="code" placeholder="Input event code" />
@@ -169,7 +177,7 @@ function App() {
           <div className="text-xl md:text-2xl lg:text-3xl font-semibold text-center text-slate-950">
             Event Code Setup
           </div>
-          <form className="mt-4 space-y-4" onSubmit={handleCodeSubmit}>
+          <form key="code-setup-form" className="mt-4 space-y-4" onSubmit={handleCodeSubmit}>
             <Input label="Name" id="codeName" placeholder="Enter your name" />
             <Input label="President's Key" id="presidentKey" placeholder="Input affiliate president's key" />
             <Input label="Event Code" id="eventCode" placeholder="Set 1-time event code" />
@@ -195,16 +203,16 @@ function App() {
   return (
     <div className="bg-red-100 font-serif min-h-screen flex flex-col">
       <div className="flex items-center justify-between p-3 bg-red-900 text-white">
-        <a className="shrink-0" href="https://hq.fsu.edu/feeds?type=club&type_id=35480&tab=about">
+        <a className="hidden shrink-0 sm:block" href="https://hq.fsu.edu/feeds?type=club&type_id=35480&tab=about">
           <img src={aasulogo} className="block h-10 w-10 object-contain" />
         </a>
-        <div className="flex flex-wrap gap-2 ml-auto items-center justify-end">
+        <div className="mx-auto flex min-w-0 flex-nowrap items-center justify-end gap-1 sm:ml-auto sm:mr-0 sm:gap-2">
           {navItems.map((item) => (
             <button
               key={item.key}
               type="button"
-              onClick={() => setCurrentPage(item.key)}
-              className={`rounded px-3 py-2 text-sm font-medium transition-colors ${
+              onClick={() => handlePageChange(item.key)}
+              className={`whitespace-nowrap rounded px-1.5 py-2 text-[12px] font-medium leading-tight transition-colors md:px-2 md:text-xs lg:px-3 lg:text-sm ${
                 currentPage === item.key
                   ? 'bg-white text-red-900 hover:bg-red-100'
                   : 'text-white hover:bg-red-800'
