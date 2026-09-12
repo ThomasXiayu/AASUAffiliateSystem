@@ -239,7 +239,7 @@ async def create_submission(
         # Validate the event code.
         key_result = (
             supabase.table("code_creations")
-            .select("event_code, affiliate")
+            .select("event_code, affiliate, uses")
             .eq("event_code", input_three)
             .limit(1)
             .execute()
@@ -275,6 +275,22 @@ async def create_submission(
 
         if not insert_result.data:
             raise RuntimeError("Database insert failed.")
+
+        uses = int(key_result.data[0].get("uses") or 0) + 1
+        usage_update = (
+            supabase.table("code_creations")
+            .update({"uses": uses})
+            .eq("event_code", input_three)
+            .execute()
+        )
+
+        if not usage_update.data:
+            raise RuntimeError("Event code failed.")
+
+        if uses >= 5:
+            supabase.table("code_creations").delete().eq(
+                "event_code", input_three
+            ).execute()
 
         # add points to affiliates
         try:
