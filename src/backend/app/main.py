@@ -285,7 +285,7 @@ async def create_submission(
         )
 
         if not usage_update.data:
-            raise RuntimeError("Event code failed.")
+            raise RuntimeError("Event usage update failed.")
 
         if uses >= 5:
             supabase.table("code_creations").delete().eq(

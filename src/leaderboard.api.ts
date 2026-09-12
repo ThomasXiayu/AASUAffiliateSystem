@@ -22,7 +22,7 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
       `${apiUrl()}/api/leaderboard`,
     );
   } catch {
-    throw new Error("Could not connect to the leaderboard.");
+    throw new Error("Connecting to server... (est. 1 minute)");
   }
 
   const responseText = await response.text();

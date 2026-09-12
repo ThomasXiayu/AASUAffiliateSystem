@@ -48,7 +48,7 @@ function Leaderboard({ refreshKey = 0 }: { refreshKey?: number }){
                     <h1 id="leaderboard" className="text-3xl md:text-4xl lg:text-5xl font-semibold text-center text-red-900">Leaderboard</h1>
 
                     <div className="max-w-3xl mx-auto mt-2 w-full p-4 sm:p-6 drop-shadow bg-gray-200 rounded-lg shadow-md border border-gray-200 space-y-2">
-                        {error && <p className="text-center text-red-200">{error}</p>}
+                        {error && <p className="text-center text-black">{error}</p>}
                         {!error && entries.map((entry) => {
                             const affiliateName = entry.affiliate?.trim() || "Unknown affiliate";
                             const logo = affiliateLogos[affiliateKey(affiliateName)];
