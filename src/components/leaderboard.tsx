@@ -43,7 +43,7 @@ function Leaderboard({ refreshKey = 0 }: { refreshKey?: number }){
 
     return (
         <div className="scroll-mt-4">
-            <div className="p-1 bg-black"> {/*border line separator*/}
+            <div className="p-1"> {/*border line separator*/}
                 <div className="flex flex-col px-4 pt-4 min-h-screen bg-red-100">
                     <h1 id="leaderboard" className="text-3xl md:text-4xl lg:text-5xl font-semibold text-center text-red-900">Leaderboard</h1>
 
