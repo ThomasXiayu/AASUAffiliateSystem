@@ -10,5 +10,5 @@ An over engineered Google Form that takes inputs and adds it to a database. Inte
 **Backend**: Python and PostgresSQL  
 
 ### Contributors
-**Project Manager**: @Sarah Thapas  
-**Developer**: @ThomasXiayu
+**Project Manager & Designer**: @saraht16 (Sarah Thapa)  
+**Developer**: @ThomasXiayu (Thomas Hall)

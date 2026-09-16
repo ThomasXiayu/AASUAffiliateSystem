@@ -239,7 +239,7 @@ async def create_submission(
         # Validate the event code.
         key_result = (
             supabase.table("code_creations")
-            .select("event_code, affiliate, uses")
+            .select("event_code, affiliate")
             .eq("event_code", input_three)
             .limit(1)
             .execute()
@@ -259,6 +259,26 @@ async def create_submission(
                 detail="Affiliates cannot earn points from their own events.",
             )
 
+        # Each affiliate may use each event code at most five times.
+        code_existing_result = (
+            supabase.table("code_uses")
+            .select("uses")
+            .eq("affiliates", input_two)
+            .eq("event_code", input_three)
+            .limit(1)
+            .execute()
+        )
+        existing_usage = code_existing_result.data[0] if code_existing_result.data else None
+        current_uses = int((existing_usage or {}).get("uses") or 0)
+
+        if current_uses >= 5:
+            raise HTTPException(
+                status_code=429,
+                detail=(
+                    f"`{input_two}` has already used the event code `{input_three}` 5 times!"
+                ),
+            )
+
         # Store the text values and image path in Postgres
         insert_result = (
             supabase.table("form_submissions")
@@ -276,20 +296,20 @@ async def create_submission(
         if not insert_result.data:
             raise RuntimeError("Database insert failed.")
 
-        uses = int(key_result.data[0].get("uses") or 0) + 1
-        usage_update = (
-            supabase.table("code_creations")
-            .update({"uses": uses})
-            .eq("event_code", input_three)
-            .execute()
-        )
 
-        if not usage_update.data:
-            raise RuntimeError("Event usage update failed.")
-
-        if uses >= 5:
-            supabase.table("code_creations").delete().eq(
+        if existing_usage:
+            supabase.table("code_uses").update(
+                {"uses": current_uses + 1}
+            ).eq("affiliates", input_two).eq(
                 "event_code", input_three
+            ).execute()
+        else:
+            supabase.table("code_uses").insert(
+                {
+                    "affiliates": input_two,
+                    "uses": 1,
+                    "event_code": input_three,
+                }
             ).execute()
 
         # add points to affiliates
