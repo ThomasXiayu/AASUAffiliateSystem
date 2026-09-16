@@ -281,7 +281,7 @@ async def create_submission(
             raise HTTPException(
                 status_code=429,
                 detail=(
-                    f"`{input_two}` has already used the event code `{input_three}` 5 times!"
+                    f"`{input_two}` has already used the event code `{input_three}` max times!"
                 ),
             )
 
