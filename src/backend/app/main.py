@@ -260,17 +260,23 @@ async def create_submission(
             )
 
         # Each affiliate may use each event code at most five times.
+        # check if affiliate has already used the event code before
         code_existing_result = (
             supabase.table("code_uses")
             .select("uses")
-            .eq("affiliates", input_two)
+            .eq("affiliate", input_two)
             .eq("event_code", input_three)
             .limit(1)
             .execute()
         )
+
+        #variable as conditional to check if the affiliate has already used the event code before
         existing_usage = code_existing_result.data[0] if code_existing_result.data else None
+
+        #log current uses for a specific event code
         current_uses = int((existing_usage or {}).get("uses") or 0)
 
+        # print error message if more than 5 is reached
         if current_uses >= 5:
             raise HTTPException(
                 status_code=429,
@@ -297,17 +303,19 @@ async def create_submission(
             raise RuntimeError("Database insert failed.")
 
 
+        # backend error handling if code insert succeeds but updating usages fails
+        # this should not block the user from submitting
         try:
             if existing_usage:
                 supabase.table("code_uses").update(
                     {"uses": current_uses + 1}
-                ).eq("affiliates", input_two).eq(
+                ).eq("affiliate", input_two).eq(
                     "event_code", input_three
                 ).execute()
             else:
                 supabase.table("code_uses").insert(
                     {
-                        "affiliates": input_two,
+                        "affiliate": input_two,
                         "uses": 1,
                         "event_code": input_three,
                     }
