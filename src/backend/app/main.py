@@ -297,20 +297,31 @@ async def create_submission(
             raise RuntimeError("Database insert failed.")
 
 
-        if existing_usage:
-            supabase.table("code_uses").update(
-                {"uses": current_uses + 1}
-            ).eq("affiliates", input_two).eq(
-                "event_code", input_three
-            ).execute()
-        else:
-            supabase.table("code_uses").insert(
-                {
-                    "affiliates": input_two,
-                    "uses": 1,
-                    "event_code": input_three,
-                }
-            ).execute()
+        try:
+            if existing_usage:
+                supabase.table("code_uses").update(
+                    {"uses": current_uses + 1}
+                ).eq("affiliates", input_two).eq(
+                    "event_code", input_three
+                ).execute()
+            else:
+                supabase.table("code_uses").insert(
+                    {
+                        "affiliates": input_two,
+                        "uses": 1,
+                        "event_code": input_three,
+                    }
+                ).execute()
+        except Exception as usage_error:
+            print(
+                "Code usage database error: "
+                f"affiliate={input_two!r}, event_code={input_three!r}, "
+                f"error={usage_error}"
+            )
+            raise HTTPException(
+                status_code=500,
+                detail="Could not record event code usage.",
+            ) from usage_error
 
         # add points to affiliates
         try:
