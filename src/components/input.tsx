@@ -10,6 +10,7 @@ import lphielogo from "../assets/lphielogo.png";
 import sasalogo from '../assets/sasalogo.png';
 import saselogo from '../assets/saselogo.png';
 import vsalogo from '../assets/vsalogo.png';
+import tasaLogo from "../assets/tasaLogo.png";
 
 function Input({ placeholder, id, label, type }: { placeholder: string, id: string, label?: string, type?: "text" | "email" | "password" | "number" }) {
     return (
@@ -22,7 +23,7 @@ function Input({ placeholder, id, label, type }: { placeholder: string, id: stri
     );
 }
 
-const options = ["AKDPhi", "CASO", "FSA", "HEAL", "JSA", "KASA", "LPhiE", "SASA", "SASE", "VSA"];
+const options = ["AKDPhi", "CASO", "FSA", "HEAL", "JSA", "KASA", "LPhiE", "SASA", "SASE", "VSA", "TASA"];
 function Dropdown({ placeholder, id, label}: { placeholder: string, id: string, label?: string}) {
     return (
         <div>
@@ -98,6 +99,7 @@ const eventLogos: Record<string, string> = {
   sasa: sasalogo,
   sase: saselogo,
   vsa: vsalogo,
+  tasa: tasaLogo,
 };
 
 function EventLogoPreview({logo}: {logo: string}) {

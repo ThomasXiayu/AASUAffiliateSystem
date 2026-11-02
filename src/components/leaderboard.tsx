@@ -9,6 +9,7 @@ import lphielogo from "../assets/lphielogo.png";
 import sasaLogo from "../assets/sasalogo.png";
 import saseLogo from "../assets/saselogo.png";
 import vsaLogo from "../assets/vsalogo.png";
+import tasaLogo from "../assets/tasaLogo.png";
 import type { LeaderboardEntry } from "../leaderboard.api";
 import { getLeaderboard } from "../leaderboard.api";
 
@@ -23,6 +24,7 @@ const affiliateLogos: Record<string, string> = {
     sasa: sasaLogo,
     sase: saseLogo,
     vsa: vsaLogo,
+    tasa: tasaLogo,
 };
 
 function affiliateKey(name: string): string {
